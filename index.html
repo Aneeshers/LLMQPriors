@@ -1,449 +1,196 @@
+<!DOCTYPE html>
 <html>
-
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="./css/academicons.min.css"/>
-	<script>
-      window.MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']],
-          displayMath: [['$$', '$$'], ['\\[', '\\]']]
-        },
-        svg: {
-          fontCache: 'global'
-        }
-      };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
-
-    <!--
-  <script src="./resources/jsapi" type="text/javascript"></script>
-  <script type="text/javascript" async>google.load("jquery", "1.3.2");</script>
- -->
-
-    <!-- @font-face {
-font-family: 'Avenir Book';
-src: url("./fonts/Avenir_Book.ttf");
-/* File to be stored at your site */
-} -->
-
-    <style type="text/css">
+    <title>Bootstrapping Temporal-Difference Learning with LLM Priors</title>
+    <style>
         body {
             font-family: "Avenir Book", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
             font-weight: 300;
-            font-size: 14px;
-            margin-left: auto;
-            margin-right: auto;
-            width: 900px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
         }
-		
-		#headerLogo {
-			position: absolute;
-			top: 10px; /* Adjust this value to position the logo from the top */
-			right: 10px; /* Adjust based on your layout's needs */
-			height: 50px; /* Set this according to your logo's size */
-		}
-		* {
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-        
-        h1 {
-            font-weight: 300;
-			font-size: 24px;
-        }
-        
-        h2 {
+        h1, h2, h3 { 
+            color: #222;
             font-weight: 300;
         }
-        
-        p {
-            font-weight: 300;
-            line-height: 1.4;
+        .highlight-blue {
+            background-color: #f5f8ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #e6eeff;
         }
-        .flex-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
+        .highlight-rose {
+            background-color: #fff5f5;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #ffe6e6;
         }
-        .flex-item {
-            flex: 1; /* Ensures each flex item takes half the space of the flex container */
+        .prompt-block {
+            background: linear-gradient(to right, #f5f8ff, #fff5f5);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
         }
-        .code-title {
+        .equation {
             text-align: center;
-            margin: 10px 0;
+            margin: 1.5rem 0;
+            font-size: 1.2em;
+            padding: 1rem;
+            color: #444;
         }
-        pre {
-            margin: 0;
-            white-space: pre-wrap; /* Wraps text within the pre element */
-        }
-        code {
-            display: block;
-        }
-        
-        pre>code {
-            display: block;
-            white-space: pre;
-            line-height: 1.5;
-            padding: 0;
-            margin: 0;
-        }
-        
-        pre.prettyprint>code {
-            border: none;
-        }
-		  .algorithm { font-family: monospace; white-space: pre; }
-		  .algorithm caption { font-weight: bold; }
-		  .algorithm code { font-weight: normal; }
-        .header {
-			width: 900px; /* Takes the full width of its parent, up to 800px */
-			text-align: right; /* Aligns the content (logo) to the right */
-			padding: 10px 0; /* Adds some vertical padding for spacing */
-		}
-		.install {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .install pre {
-            margin: 0; /* Removes default margin from pre elements */
-            text-align: left; /* Ensures text within the pre element is left-aligned */
-        }
-		
-        .code-container {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            text-align: left; /* Ensures text inside the container is left-aligned */
-        }
-        .code-container.installation {
-            display: inline-block; /* Only as wide as the content */
-            margin-right: auto; /* Aligns the container to the left */
-            margin-left: 0; /* Ensures no extra space on the left */
-        }
-
-		.header-logo {
-			height: 50px; /* Adjust based on your logo's size */
-		}
-        .disclaimerbox {
-            background-color: #eee;
-            border: 1px solid #eeeeee;
-            border-radius: 10px;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-            padding: 20px;
-        }
-        .link-pill {
-			background-color: #000000; /* Black background for the pill */
-			color: white !important; /* This is crucial to override the default link color */
-			text-decoration: none; /* Remove underline from links */
-			padding: 10px 20px;
-			border-radius: 20px; /* Rounded corners for pill shape */
-			font-size: 15px;
-			display: inline-flex;
-			align-items: center; /* Align the icon and text vertically */
-			margin: 1px;
-			transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
-		}
-
-		.link-pill:hover {
-			background-color: #150E12; /* Dark reddish background on hover */
-			color: #FF0000 !important; /* Reddish color for text and icon on hover */
-		} 
-
-		.link-pill i, .link-pill img {
-			margin-right: 5px; /* Space between icon and text */
-			color: white; /* Ensure icons inherit the color from the parent */
-		}
-
-        video.header-vid {
-            height: 140px;
-            border: 1px solid black;
-            border-radius: 10px;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-        }
-        
-        img.header-img {
-            height: 140px;
-            border: 1px solid black;
-            border-radius: 10px;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-        }
-        
-        img.rounded {
-            border: 0px solid #eeeeee;
-            border-radius: 10px;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-        }
-        
-        a:link,
-        a:visited {
+        .reference {
             color: #1367a7;
             text-decoration: none;
         }
-        
-        a:hover {
+        .reference:hover {
             color: #208799;
         }
-        
-        td.dl-link {
-            height: 160px;
-            text-align: center;
-            font-size: 22px;
+        .author-info {
+            color: #666;
+            margin-bottom: 2rem;
         }
-        
-        .layered-paper-big {
-            /* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
-            box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.35), /* The top layer shadow */
-            5px 5px 0 0px #fff, /* The second layer */
-            5px 5px 1px 1px rgba(0, 0, 0, 0.35), /* The second layer shadow */
-            10px 10px 0 0px #fff, /* The third layer */
-            10px 10px 1px 1px rgba(0, 0, 0, 0.35), /* The third layer shadow */
-            15px 15px 0 0px #fff, /* The fourth layer */
-            15px 15px 1px 1px rgba(0, 0, 0, 0.35), /* The fourth layer shadow */
-            20px 20px 0 0px #fff, /* The fifth layer */
-            20px 20px 1px 1px rgba(0, 0, 0, 0.35), /* The fifth layer shadow */
-            25px 25px 0 0px #fff, /* The fifth layer */
-            25px 25px 1px 1px rgba(0, 0, 0, 0.35);
-            /* The fifth layer shadow */
-            margin-left: 10px;
-            margin-right: 45px;
+        .references {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 2rem;
         }
-		.large-equation .MathJax {
-        font-size: 1.5em; /* Adjust to your preferred size */
-    	}
-        
-        .layered-paper {
-            /* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
-            box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.35), /* The top layer shadow */
-            5px 5px 0 0px #fff, /* The second layer */
-            5px 5px 1px 1px rgba(0, 0, 0, 0.35), /* The second layer shadow */
-            10px 10px 0 0px #fff, /* The third layer */
-            10px 10px 1px 1px rgba(0, 0, 0, 0.35);
-            /* The third layer shadow */
-            margin-top: 5px;
-            margin-left: 10px;
-            margin-right: 30px;
-            margin-bottom: 5px;
+        .references p {
+            margin-bottom: 0.8em;
+            padding-left: 2em;
+            text-indent: -2em;
         }
-        
-        .vert-cent {
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        hr {
-            border: 0;
-            height: 1px;
-            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin: 1.5rem 0;
         }
     </style>
-<title>FastTRAC</title>
 </head>
-
 <body>
-<br>
-	<center>
-		<span style="font-size:32px"><strong>&nbsp; &nbsp; &nbsp;Permutation Invariant Learning&nbsp; </strong>
-		<color-profile><strong>&nbsp;</strong></color-profile>
-		<strong> &nbsp;</strong><br>
-		<span style="font-size: 28px;">with High-Dimensional Particle Filters</span></span><br><br><br>
-	</center>
+    <h1><strong>Blog 0: </strong>LLMs as Value-Function Approximators<strong>&nbsp;</strong></h1>
+    <div class="author-info">
+        <p>By <a href="https://aneeshers.github.io">Aneesh Muppidi</a><br>
+December 2024</p>
+    </div>
 
-    <table align="center" width="800px">
-        <tbody>
-            <tr>
-                <td align="center" width="160px">
-                    <center>
-						<span style="font-size:20px"><a href="https://akhilanb.github.io">Akhilan Boopathy</a><sup>1🔺<strong>&nbsp;</strong></sup></span>
+    <h2><strong>Q-learning and Dogs</strong></h2>
+    <div class="highlight-blue">
+      <p>In my reinforcement learning projects—<a href="https://computationalrobotics.seas.harvard.edu/TRAC/">optimization for lifelong RL</a> <a href="https://arxiv.org/abs/2405.16642" class="reference">[1]</a>, <a href="https://aneeshers.github.io/PermutationInvariantLearning/">policy particle filters</a>, and generative agent models—I often found myself circling back to the fundamentals: <strong>temporal-difference (TD) learning</strong> <a href="https://arxiv.org/abs/2304.00803" class="reference">[2]</a>, <a href="http://incompleteideas.net/book/the-book-2nd.html" class="reference">[3]</a>. While elegant in theory, Q-learning often surprises me, as it starts tabula rasa—and it often feels like, to me at least, that Q-updates are like a dog chasing its own tail.</p>
 
-                    </center>
-                </td>
-                <td align="center" width="160px">
-                    <center>
-                        <span style="font-size:20px"><a href="https://aneeshers.github.io">Aneesh Muppidi</a><sup>2🔺</sup></span>
-                    </center>
-                </td>
-                <td align="center" width="160px">
-                    <center>
-                        <span style="font-size:20px">Peggy Yang<sup>1&nbsp;</sup></span>
-                    </center>
-                </td>
+        <p>This realization has motivated me to ask: <strong>why not initialize the Q-values with something better than random? Specifically, can we use large language models (LLMs) as zero-shot value approximators to warm-start the Q-table or network?</strong></p>
+</div>
 
-          </tr>
+    <h2><strong>LLMs as Function Approximators in RL</strong></h2>
+    <div class="highlight-blue">
+      <p>LLMs for decision-making tasks is nothing new. Examples include <a href="https://arxiv.org/abs/2305.16291" class="reference">VOYAGER</a> <a href="https://arxiv.org/abs/2305.16291" class="reference">[4]</a>, an LLM-driven lifelong learning agent in Minecraft. Similarly, <a href="https://arxiv.org/abs/2310.17722" class="reference">LLaRP</a> <a href="https://arxiv.org/abs/2310.17722" class="reference">[5]</a> finetunes LLMs with actor and critic heads for embodied visual tasks. In-context learning for policy iteration has also been explored <a href="https://arxiv.org/abs/2210.03821" class="reference">[6]</a>. In robotics, vision-language-action models, such as <a href="https://arxiv.org/abs/2406.09246" class="reference">OpenVLA</a> <a href="https://arxiv.org/abs/2406.09246" class="reference">[7]</a>, finetune LLMs to directly output motor commands. LLMs and VLMs have also been used as reward approximators <a href="https://arxiv.org/abs/2310.12921" class="reference">[8]</a> and reward designers <a href="https://arxiv.org/abs/2303.00001" class="reference">[9]</a>, <a href="https://arxiv.org/abs/2306.08647" class="reference">[10]</a>, <a href="https://arxiv.org/abs/2310.12931" class="reference">[11]</a>.</p>
 
-        </tbody>
-    </table><br>
-<table align="center" width="800px">
-        <tbody>
-            <tr>
-                <td align="center" width="160px">
-                    <center>
-						<span style="font-size:20px">Abhiram<a> Iyer</a><sup>1</sup></span>
+        <p>Distinct from using LLMs as policy and reward approximators, I want to investigate the use of LLMs <strong>as value function approximators</strong> in Q learning. My idea draws on the idea of distilling LLM priors into Q-learning, where LLMs predict initial value estimates for states based on their encoded world knowledge. Unlike policy-based applications, this approach focuses on bootstrapping TD methods by providing more informative priors to the Q-network or Q-table, trying to tackle the "inefficiency" of tabula rasa learning.</p>
+    </div>
 
-                    </center>
-                </td>
-                <td align="center" width="160px">
-                    <center>
-                        <span style="font-size:20px">William Yue<sup>1&nbsp;</sup></span>
-                    </center>
-                </td>
-                <td align="center" width="160px">
-                    <center>
-                        <span style="font-size:20px"><a href="https://fietelab.mit.edu/people/">Ila Fiete</a><sup>1&nbsp;</sup></span>
-                    </center>
-                </td>
+    <h2><strong>Proof of Concept - Simple Grid World</strong></h2>
+    <div class="highlight-blue">
+      <p>I quickly designed a 12x12 grid-world environment to quickly test how different Q-table initializations affect convergence. The agent's goal is to reach the terminal state at (11, 11), incurring a reward of -1 for each non-terminal step.</p>
 
-          </tr>
+        <h3><strong>LLMs for Grid-world Value Approximation</strong></h3>
+        <p>To initialize the Q-table with LLM estimates, I instructed GPT-4o to estimate Q-values for state-action pairs. The model was prompt-engineered with descriptions of the environment and the Bellman equation to output structured JSON representations. Below is a partial version of the system prompt:</p>
+    </div>
 
-        </tbody>
-    </table><br>
-    <table align="center" width="700px">
-        <tbody>
-            <tr>
-                <td align="center" width="350px">
-                    <center>
-                        <span style="font-size:18px"><sup>1</sup>Massachusetts Institute of Technology</span>
-                    </center>
-                </td>
-              <td align="center" width="250px">
-                    <center>
-                      <span style="font-size:18px"><sup>2</sup>Harvard College</span>
-                    </center>
-                </td>
-
-            </tr>
-        </tbody>
-    </table>
-    <table align="center" width="700px">
-        <tbody>
-			<tr style="display: flex; justify-content: center; gap: 40px;"> <!-- Add flexbox to control spacing -->
-				<td style="margin: 40; padding: 0;"> <!-- Remove extra padding and margin -->
-					<a href="https://arxiv.org/abs/2405.16642" target="_blank" class="link-pill">
-						<i style="padding-right:2px; font-size:23px" class="ai ai-arxiv" aria-hidden="true"></i> ArXiv
-					</a>
-				</td>
-				<td style="margin: 40; padding: 0;"> <!-- Remove extra padding and margin -->
-					<a href="" target="_blank" class="link-pill">
-						<i style="padding-right:2px; font-size:23px" class="fab fa-github" aria-hidden="true"></i> Experiments
-					</a>
-				</td>
-			</tr>
-</tbody>
-
-    </table>
-	<p style="background: #74b9ff;">
-      <center>
-        &nbsp;🔺Indicates<strong> </strong><strong>equal contribution</strong><strong>&nbsp;</strong>
-      </center>
-    </p>
-    <hr>
-    <center>
-        <h2>
-        <strong> Abstract: What is the <em>optimal</em> order of training data?</strong> </h2>
-    </center>
-	<p>     Sequential learning in deep models often suffers from challenges such as <strong>catastrophic forgetting</strong> and<strong> loss of plasticity</strong>, largely due to the permutation dependence of gradient-based algorithms, where the order of training data impacts the learning outcome. In this work, we introduce a novel permutation-invariant learning framework based on high-dimensional particle filters. We theoretically demonstrate that particle filters are invariant to the sequential ordering of training minibatches or tasks, offering a principled solution to mitigate catastrophic forgetting and loss-of-plasticity. We develop an efficient particle filter for optimizing high-dimensional models, combining the strengths of Bayesian methods with gradient-based optimization. Through extensive experiments on continual supervised and reinforcement learning benchmarks, including SplitMNIST, SplitCIFAR100, and ProcGen, we empirically show that our method consistently improves performance, while reducing variance compared to standard baselines.
-    <p>&nbsp;</p>
-<p>
-</p>
-
-    <hr>
-    <center>
-        <h2> Why do we want Permutation Invariance?</h2>
-		<p>     <strong>We argue that both Catastrophic Forgetting and Loss of Plasticity are due to a weak permutaiton of training data. Unlike conventional training, where minibatch data is randomized, &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</strong>
-      <p>&nbsp;</p>
-		<center>
-			<p> Loss of plasticity arises from adapting to <strong>strictly ordered</strong> tasks.</p>
-		<img class="rounded" src="./assets/justProcgenTasks.gif" width="500px">
-		</center>
-		<center>
-			<p> Catastrophic forgetting arises from learning <strong>strictly ordered</strong> tasks.</p>
-		<img class="rounded" src="./assets/justMNIST Tasks.gif" width="500px">
-		<br>
-			<br><br/>
-			We propose to view these learning problems through the lens of <em>permutation invariance</em>. By developing learning algorithms that are invariant to the order of data presentation, we can mitigate catastrophic forgetting and loss of  plasticity. Our key insight is the use of <em>particle filters</em>, a probabilistic tool widely used in state estimation, to achieve this goal.
-        </center>
-    </center>
-    <br/>
-
-
-<br />
-	<div style="text-align: center;"> </div>
-	<br />
-	
-    <hr>
-<center>
-    <h2> We derive a high dimensional particle filter weighting rule based on Bayesian Model Averageing that is <strong>Permutation Invariant.</strong></h2>
-	</center>
-
-		<div class="large-equation">
-			<p>
-				\[
-					\displaystyle w_{t+1}^{(i)} = w_t^{(i)} e^{-\frac{L_{t+1}(x_{t+1}^{(i)}) + L_{t+1}(x^{(i)}_t)}{2}}
-				\]
-			</p>
-
-		</div>
-		<div style="flex: 0.2; text-align: center;">
-			<img class="rounded" src="./assets/particle_flow_animation_row.gif" width="1000px">
-		</div>
-
-			
-    <br />
-
-
-
-	
-    <br />
-<center>
-</center>
-    <br />
-    <hr>
-	<center>
-        <h2>Our Particle Filter both avoids Catastrophic Forgetting and Loss of Plasticity</h2>
-		<img class="rounded" src="./assets/varianceVsMean.jpg" width="800px">
-		<br>
-		<br/>
-		<img class="rounded" src="./assets/multi_game_reward_curves.jpg" width="800px">
-
-    </center>
-	<p>&nbsp;</p>
-    <br />
-    <hr>
-    <center>
+    <div class="prompt-block">
+        <p><em>You are a helpful assistant who reasons through Q-learning calculations step by step. Guide the user through the solution to estimate Q-values for each action (up, down, left, right) for State (STATE), and then provide the best action. We are working with a 12x12 grid world environment. The agent can move in four directions: up, down, left, or right. The bottom-right corner (state (11, 11)) is the terminal state, and all other states give a reward of -1 for each step. The discount factor (γ) is {gamma}.</em></p>
         
-</center>
+        <p>For each action (up, down, left, right), compute the Q-value by considering the immediate reward and the discounted value of the next state, based on the formula:</p>
+        
+        <div class="equation">
+            Q(s, a) = r(s, a) + γ max<sub>a'</sub> Q(s', a')
+        </div>
+        
+        <p><em>(This is a summary of the full prompt, which includes additional details about the task setup and response structure.)</em></p>
+    </div>
 
-   
+    <div class="highlight-blue">
+        <p>Using the LLM-estimated Q-values for initialization significantly accelerated convergence in tabular Q-learning (LLaMA-70b gets similar results).</p>
+    </div>
 
-   
+    <img src="assets/bootstrapping.png" alt="Comparison of value initialization methods in grid world" />
+    <p><em>Comparison of value initialization methods in a 12x12 grid world: GPT-4o generates suboptimal Q-values (middle) compared to true value iteration (left). Tabular Q-learning with GPT-4o-initialized Q-table significantly accelerates convergence over random initialization across 30 runs (right).</em></p>
 
-    <hr>
+    <div class="highlight-blue">
+        <p>While these results are promising, they raise questions about scalability. <strong>How can this approach be extended to high-dimensional RL tasks/games like Crafter and be integrated with Deep Q-learning methods?</strong></p>
+    </div>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70157890-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+    <h2><strong>Scaling LLM Value Approximation for High-Dimensional Problems</strong></h2>
+    <div class="highlight-blue">
+      <p>To explore the scalability of large model value approximation, we propose extending this framework to high-dimensional tasks such as Crafter <a href="https://arxiv.org/abs/2109.06780" class="reference">[12]</a>, a procedurally-generated survival environment where an agent interacts with the world through discrete text actions (e.g., "chop wood" or "craft tools"). Crafter is challenging due to its vast state space, sparse rewards, and the necessity for long-horizon planning.</p>
+    </div>
 
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
+    <h3><strong>Challenges</strong></h3>
+    <div class="highlight-rose">
+        <ol>
+            <li><strong>Inference Budget:</strong> Querying LLMs at scale is computationally (and sometimes financially) expensive, with each inference call taking seconds. This makes frequent online queries infeasible for online RL. Instead, we need to rely on efficient caching strategies to pre-compute and store value estimates for explored states rather than compute it on-the-fly.</li>
+            
+            <li><strong>Large State Space:</strong> In high-dimensional environments like Crafter, the number of unique states is vast, often running into millions. Storing value estimates for all possible states is impractical. Thus, we must prioritize which states to cache and develop mechanisms to generalize cached values to uncached states.</li>
+            
+            <li><strong>State Representation:</strong> LLMs excel at leveraging semantic inductive biases in text-based representations for reasoning but struggle to do the same with raw image-based observations <a href="https://arxiv.org/abs/2403.04732" class="reference">[13]</a>, such as the ones in Crafter.</li>
+            
+            <li><strong>Value Prediction:</strong> While the Bellman equation guided value prediction in grid-world experiments, adapting this approach to more complex environments requires additional context. For instance, Crafter's text-based actions (e.g., "chop wood") naturally align with LLM priors, but achieving precise value estimates for high-dimensional states remains a challenge.</li>
+        </ol>
+    </div>
 
-        gtag('config', 'UA-70157890-3');
-    </script>
+    <h3><strong>Proposed Solutions</strong></h3>
+    <div class="highlight-blue">
+        <ol>
+            <li><strong>Efficient State Caching:</strong> We can cache value estimates at strategic intervals during exploration, guided by state visitation frequency or curiosity-driven mechanisms <a href="https://arxiv.org/abs/2302.06692" class="reference">[14]</a>, <a href="http://arxiv.org/abs/1705.05363" class="reference">[15]</a>. This ensures that cached states are representative of the agent's experience. Additionally, we can draw on methods for guided state selection from the literature on offline RL <a href="https://arxiv.org/abs/2111.14629" class="reference">[16]</a> to optimize caching strategies.</li>
+            
+            <li><strong>Generalizing to Uncached States:</strong> To assign values to uncached states, we can develop similarity-based value transfer functions. Specifically, the value of an uncached state is determined based on its similarity to cached states. A naive approach might involve computing similarity between states using pixel distances or CLIP embeddings. However, pixel-similar states can have drastically different values (e.g., in Pong, the paddle's position can mean the difference between scoring and missing).
+            <p>To address this, we adapt techniques like Generalized Similarity Functions (GSFs) <a href="https://arxiv.org/abs/2111.14629" class="reference">[16]</a> or Object-Centric Generalized Value Functions (GVFs) <a href="https://arxiv.org/abs/2304.13892" class="reference">[17]</a>, which compute similarities grounded in expected future trajectories or object-centric features.</p>
+            </li>
+            
+            <li><strong>Textual State Representation:</strong> Crafter's image-based observations pose a unique challenge for LLM integration, which thrives on text-based representations <a href="https://arxiv.org/abs/2304.02868" class="reference">[18]</a>. Converting image states into text using methods like CLIPCaption <a href="https://arxiv.org/abs/2111.09734" class="reference">[19]</a> or GIT <a href="https://arxiv.org/abs/2205.14100" class="reference">[20]</a> can help exploit the LLM's semantic biases. For instance, an image of a tree could be captioned as "a tree with wood resources," providing richer context for value estimation than raw pixel data.</li>
+            
+            <li><strong>Goal-Conditioned Value Approximation:</strong> To address precise value estimates, we build on the findings of <a href="https://arxiv.org/abs/2411.04549" class="reference">[21]</a>, who demonstrate that LLMs excel at in-context value prediction when goals are described in rich detail and value examples are provided in-context.</li>
+        </ol>
+    </div>
 
+    <h3><strong>Incorporating Cached Value Estimates</strong></h3>
+    <div class="highlight-blue">
+      <p>While directly initializing a Q-network with value estimates from LLMs or cached states may not be feasible, we can incorporate these estimates into the training process through TD updates. Specifically, during the initial stages of training, we can compute the TD error in a DQN by replacing the target Q-network's estimates with the cached value estimates for N steps. This guides the Q-network toward a more informed initialization. After this warm up period, we switch back to using the target Q-network for TD error computation, allowing the model to refine its values based on learned dynamics.</p>
+    </div>
 
-</body>
+    <h3><strong>Analysis</strong></h3>
+    <div class="highlight-rose">
+      <p><strong>Impact on Policy Convergence:</strong> We will evaluate whether LLM Q value initialization and similarity-based caching improve convergence speed in deep Q-learning methods, including DQN and Double DQN, on Crafter and other high-dimensional RL games.</p>
 
-</html>
+        <p><strong>Value Predictions:</strong> We will analyze LLM-based value predictions: are predictions more accurate near goal states or initial states? Are overall predictions optimistic or pessimistic? How consistent are value predictions across structurally similar states?</p>
+    </div>
+
+<div class="references">
+    <h2>References</h2>
+    <p>[1] Muppidi, A., Zhang, Z., & Yang, H. (2024). Fast TRAC: A Parameter-Free Optimizer for Lifelong Reinforcement Learning.</p>
+    <p>[2] Vidyasagar, M. (2023). A Tutorial Introduction to Reinforcement Learning.</p>
+    <p>[3] Sutton, R. S., & Barto, A. G. (1998). Reinforcement Learning: An Introduction. The MIT Press.</p>
+    <p>[4] Wang, G., et al. (2023). Voyager: An Open-Ended Embodied Agent with Large Language Models.</p>
+    <p>[5] Szot, A., et al. (2024). Large Language Models as Generalizable Policies for Embodied Tasks.</p>
+    <p>[6] Brooks, E., Walls, L., Lewis, R. L., & Singh, S. (2023). Large Language Models can Implement Policy Iteration.</p>
+    <p>[7] Kim, M. J., et al. (2024). OpenVLA: An Open-Source Vision-Language-Action Model.</p>
+    <p>[8] Rocamonde, J., Montesinos, V., Nava, E., Perez, E., & Lindner, D. (2024). Vision-Language Models are Zero-Shot Reward Models for Reinforcement Learning.</p>
+    <p>[9] Kwon, M., Xie, S. M., Bullard, K., & Sadigh, D. (2023). Reward Design with Language Models.</p>
+    <p>[10] Yu, W., et al. (2023). Language to Rewards for Robotic Skill Synthesis.</p>
+    <p>[11] Ma, Y. J., et al. (2024). Eureka: Human-Level Reward Design via Coding Large Language Models.</p>
+    <p>[12] Hafner, D. (2022). Benchmarking the Spectrum of Agent Capabilities.</p>
+    <p>[13] Zhang, Y., et al. (2024). How Far Are We from Intelligent Visual Deductive Reasoning?</p>
+    <p>[14] Du, Y., et al. (2023). Guiding Pretraining in Reinforcement Learning with Large Language Models.</p>
+    <p>[15] Pathak, D., Agrawal, P., Efros, A. A., & Darrell, T. (2017). Curiosity-driven Exploration by Self-supervised Prediction.</p>
+    <p>[16] Mazoure, B., Kostrikov, I., Nachum, O., & Tompson, J. (2021). Improving Zero-shot Generalization in Offline Reinforcement Learning using Generalized Similarity Functions.</p>
+    <p>[17] Nath, S., Subbaraj, G. R., Khetarpal, K., & Kahou, S. E. (2023). Discovering Object-Centric Generalized Value Functions from Pixels.</p>
+    <p>[18] Tsai, C. F., Zhou, X., Liu, S. S., Li, J., Yu, M., & Mei, H. (2023). Can Large Language Models Play Text Games Well? Current State-of-the-Art and Open Questions.</p>
+    <p>[19] Mokady, R., Hertz, A., & Bermano, A. H. (2021). ClipCap: CLIP Prefix for Image Captioning.</p>
+    <p>[20] Wang, J., et al. (2022). GIT: A Generative Image-to-text Transformer for Vision and Language.</p>
+    <p>[21] Ma, Y. J., et al. (2024). Vision Language Models are In-Context Value Learners.</p>
+</div>
